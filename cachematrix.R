@@ -1,14 +1,25 @@
 ## Put comments here that give an overall description of what your
 ## functions do
 
+##############################################################################
+## How to test caching on an example
+##############################################################################
+##
+## We can choose an Hilbert matrix available in the Matrix library
+##
+## > library(Matrix)
+## > M <- as.matrix(Hilbert(10)) ## Caution: using a dimension above 11 will be lead to computational singularity
+## > MC <- makeCacheMatrix(M)
+## > cacheSolve(MC) ## Should return the inverted matrix without message "getting cached data"
+## > cacheSolve(MC) ## Should return the inverted matrix with message "getting cached data"
+
 ## Write a short comment describing this function
 
 makeCacheMatrix <- function(x = matrix()) {
     
     ## Initialize cached value in scope
     ## of the function
-    xDim = dim(x)
-    cached <- matrix(, nrow=xDim[1], ncol=xDim[2])
+    cached <- NULL
     
     ## Define function handlers for retrieve, compute,
     ## and caching any operation on a matrix. We are
@@ -18,12 +29,11 @@ makeCacheMatrix <- function(x = matrix()) {
     ## of this function
     setMatrix <- function(y) {
         x <<- y
-        yDim = dim(y)
-        cached <<- matrix(, nrow=yDim[1], ncol=yDim[2])
+        cached <<- NULL
     }
     getMatrix <- function() x
     setMatrixFunc <- function(computed) cached <<- computed
-    getMaxtrixFunc <- function() cached
+    getMatrixFunc <- function() cached
     
     ## Return the list of function handlers
     list(setMatrix = setMatrix, getMatrix = getMatrix,
@@ -34,7 +44,7 @@ makeCacheMatrix <- function(x = matrix()) {
 
 ## Write a short comment describing this function
 
- <- function(x, ...) {
+cacheSolve <- function(x, ...) {
     
     ## Retrieve the cached inverse if already
     ## processed
@@ -46,9 +56,12 @@ makeCacheMatrix <- function(x = matrix()) {
     
     ## Compute the matrix inverse
     currentMatrix <- x$getMatrix()
-    matInv <- solve(currentMatrix)
+    matInv <- solve(currentMatrix, ...)
     x$setMatrixFunc(matInv)
     
     ## Return a matrix that is the inverse of 'x'
     matInv
 }
+
+
+
